@@ -8,10 +8,10 @@ import {CoffeeIcon, GoogleIcon} from 'assets/icons'
 import {Button} from 'components/lib'
 import {motion} from 'framer-motion'
 import {GoogleLogin} from '@react-oauth/google'
-import { login } from 'utils/auth'
+import { useAuth } from 'context/auth-context'
 
 function UnauthenticatedApp() {
-  const googleButton = document.querySelector('#google-button')
+  const {login} = useAuth()
   return (
     <Container>
       <motion.div>
@@ -54,4 +54,4 @@ const Container = styled.div({
 
 // })
 
-export {UnauthenticatedApp}
+export default UnauthenticatedApp

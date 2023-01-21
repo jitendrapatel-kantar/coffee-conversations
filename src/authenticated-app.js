@@ -14,4 +14,4 @@ function AuthenticatedApp() {
     )
 }
 
-export {AuthenticatedApp}
+export default AuthenticatedApp

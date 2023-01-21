@@ -3,18 +3,17 @@ import {jsx} from '@emotion/react'
 
 import * as React from 'react'
 import * as auth from 'utils/auth'
-import {client} from 'utils/api-client'
+import { Loginclient } from 'utils/api-client'
 import {useAsync} from 'utils/hooks'
 import {FullPageLoading, FullPageErrorFallback} from 'components/lib'
-import { AnimatePresence } from 'framer-motion'
+import {AnimatePresence} from 'framer-motion'
 
 async function getUser() {
-  
   let user = null
 
   const idtoken = await auth.getToken()
   if (idtoken) {
-    user = await client('login', {data: {idtoken}})
+    user = await Loginclient({idtoken})
   }
 
   return user
@@ -51,16 +50,17 @@ function AuthProvider(props) {
     setData(null)
   }, [setData])
 
-  const value = React.useMemo(() => ({user, login, logout}), [
-    login,
-    logout,
-    user,
-  ])
+  const value = React.useMemo(
+    () => ({user, login, logout}),
+    [login, logout, user],
+  )
 
   if (isLoading || isIdle) {
-    return <AnimatePresence>
+    return (
+      <AnimatePresence>
         <FullPageLoading />
-    </AnimatePresence>
+      </AnimatePresence>
+    )
   }
 
   if (isError) {

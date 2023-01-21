@@ -1,4 +1,4 @@
-import { client } from "./api-client"
+import { Loginclient } from "./api-client"
 const localStorageKey = '__auth_provider_token__'
 
 async function getToken() {
@@ -6,13 +6,17 @@ async function getToken() {
 }
 
 function handleUserResponse({user, idtoken}) {
-  console.log(user, 'handleUser')
   window.localStorage.setItem(localStorageKey, idtoken)
-  return null
+  if(user.code === 500){
+    return null
+  }
+  
+  return user
 }
 
 function login({idtoken}) {
-  return client('login', {data: {idtoken}}).then((user) => handleUserResponse({user, idtoken}))
+  console.log(idtoken, 'token')
+  return Loginclient({idtoken}).then((user) => handleUserResponse({user, idtoken}))
 }
 
 
