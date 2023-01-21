@@ -1,0 +1,7 @@
+export const brown = '#594545'
+export const light = '#FFF8EA'
+export const white = '#F9F9F9'
+export const brownLightened1 = '#815B5B'
+export const brownLightened2 = '#815B5B'
+export const black = '#222222'
+export const danger = '#ef5350'
