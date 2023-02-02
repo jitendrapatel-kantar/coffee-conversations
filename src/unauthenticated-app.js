@@ -1,11 +1,10 @@
 /** @jsx jsx */
-import {css, jsx} from '@emotion/react'
+import {jsx} from '@emotion/react'
 
 import React from 'react'
 import styled from '@emotion/styled'
 import * as colors from 'styles/colors'
-import {CoffeeIcon, GoogleIcon} from 'assets/icons'
-import {Button} from 'components/lib'
+import {CoffeeIcon} from 'assets/icons'
 import {motion} from 'framer-motion'
 import {GoogleLogin} from '@react-oauth/google'
 import { useAuth } from 'context/auth-context'
@@ -19,7 +18,8 @@ function UnauthenticatedApp() {
         <h1>Coffee Conversations</h1>
       </motion.div>
       <motion.div
-        initial={{scale: 1.4}}
+        initial={{opacity: 0}}
+        animate={{scale: 1.4, opacity: 1}}
       >
         <GoogleLogin
           onSuccess={credentialResponse => login({idtoken: credentialResponse.credential})}
@@ -36,7 +36,7 @@ function UnauthenticatedApp() {
 
 const Container = styled.div({
   height: '100%',
-  backgroundColor: colors.light,
+  backgroundColor: colors.white,
   display: 'flex',
   flexDirection: 'column',
   gap: '32px',

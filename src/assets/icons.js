@@ -29,10 +29,10 @@ function CoffeeIcon({size = 24, animation = false, loop = false} = {}) {
       viewBox={`0 0 24 24`}
       fill="none"
       stroke="#222222"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      class="feather feather-coffee"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="feather feather-coffee"
     >
       <motion.path
         d="M18 8h1a4 4 0 0 1 0 8h-1"

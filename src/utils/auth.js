@@ -15,7 +15,6 @@ function handleUserResponse({user, idtoken}) {
 }
 
 function login({idtoken}) {
-  console.log(idtoken, 'token')
   return Loginclient({idtoken}).then((user) => handleUserResponse({user, idtoken}))
 }
 

@@ -17,7 +17,6 @@ async function client(
 
   return window.fetch(`${apiURL}/${endpoint}`, config).then(async response => {
     const data = await response.json()
-    console.log(data, 'data')
     if (response.ok) {
       return data
     } else {
@@ -38,7 +37,6 @@ async function Loginclient(
     },
   }
 
-  console.log(config, "user")
   return window.fetch(`${apiURL}/login`, config).then(async response => {
     const user = await response.json()
     if (response.ok) {
