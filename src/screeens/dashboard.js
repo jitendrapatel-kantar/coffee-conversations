@@ -2,13 +2,19 @@
 import {jsx} from '@emotion/react'
 
 import React from 'react'
-import styled from '@emotion/styled'
-import {Button, Card, Modal} from 'components/lib'
+import {
+  Button,
+  Card,
+  Modal,
+  hoverUnderlineAnimation,
+  BlackTooltip,
+} from 'components/lib'
 import {motion, AnimatePresence} from 'framer-motion'
 import * as colors from 'styles/colors'
-import useSWR, { useSWRConfig } from 'swr'
+import useSWR, {useSWRConfig} from 'swr'
 import {client} from 'utils/api-client'
 import {useAuth} from 'context/auth-context'
+import {Link as RouterLink} from 'react-router-dom'
 
 function IntroCard() {
   const {user} = useAuth()
@@ -18,9 +24,13 @@ function IntroCard() {
   )
 
   const coffeeDateMembers = currentDate?.Users.map(member => (
-    <li key={member.ID}>{member.Name}</li>
+    <BlackTooltip key={member.ID} title={member.Email}>
+      <motion.span {...hoverUnderlineAnimation({variant: 'initial'})}>
+        {member.Name}
+      </motion.span>
+    </BlackTooltip>
   ))
-  
+
   const {mutate} = useSWRConfig()
   async function register() {
     await client('coffeedate/register', {
@@ -32,12 +42,9 @@ function IntroCard() {
   }
   return (
     <Card>
-      <h2 css={{fontWeight: 600}}>
-        Hello {user.Name}, Welcome to Coffee Conversations
-      </h2>
+      <h2>Hello {user.Name}, Welcome to Coffee Conversations</h2>
       <section
         css={{
-          marginTop: '16px',
           display: 'flex',
           gap: '32px',
           flexWrap: 'wrap',
@@ -48,7 +55,6 @@ function IntroCard() {
           css={{
             fontSize: '1.5rem',
           }}
-          {...hoverAnimation}
         >
           Register for the coffee date
         </motion.p>
@@ -58,52 +64,67 @@ function IntroCard() {
         </Button>
       </section>
       {currentDate && (
-        <section css={{marginTop: '16px'}}>
-          <motion.p css={{fontSize: '1.25rem'}}>
-            This week's coffee date group is:
-          </motion.p>
-          <ul>{coffeeDateMembers}</ul>
-        </section>
+        <>
+          <section
+            css={{
+              marginTop: 24,
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 32,
+              alignItems: 'baseline',
+            }}
+          >
+            <motion.p css={{fontSize: '1.25rem'}}>
+              This week's coffee date group is:
+            </motion.p>
+            {coffeeDateMembers}
+          </section>
+          <section css={{marginTop: 16}}>
+            <p>
+              To accept proposals, propose new date and time, edit/create note
+              for the date click on current date and to see all the notes and
+              information about previous dates click on previous dates.
+            </p>
+            <div
+              css={{marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 16}}
+            >
+              <RouterLink to="current-date">
+                <Button variant={'black'}>Current Date</Button>
+              </RouterLink>
+              <RouterLink to="previous-dates">
+                <Button variant={'gray80'}>previous Dates</Button>
+              </RouterLink>
+            </div>
+          </section>
+        </>
       )}
     </Card>
   )
-}
-
-const hoverAnimation = {
-  initial: {
-    textDecoration: 'none',
-    textUnderlineOffset: '24px',
-  },
-  whileHover: {
-    textDecoration: 'underline',
-    textDecorationThickness: '2px',
-    textUnderlineOffset: '8px',
-  },
-  transition: {
-    type: 'spring',
-    stiffness: 2000,
-    damping: 100,
-  },
 }
 
 function InfoButton() {
   const [isopen, setIsopen] = React.useState(false)
   const open = () => {
     setIsopen(true)
-    document.body.style.overflow = 'hidden'
   }
   const close = () => {
     setIsopen(false)
-    document.body.style.overflow = 'auto'
   }
   return (
     <>
       <Button
         variant="white"
-        onClick={open}
+        onClick={() => open()}
         layoutId="button-to-modal"
         transition={{type: 'spring', stiffness: 100, damping: 15}}
-        initial={{boxShadow: 'var(--shadow-elevation-low)'}}
+        css={{
+          boxShadow: 'var(--shadow-elevation-low)',
+          transition: 'box-shadow 200ms',
+          ':hover': {
+            boxShadow: 'var(--shadow-elevation-high)',
+          },
+          zIndex: 2,
+        }}
       >
         More info
       </Button>
@@ -112,6 +133,7 @@ function InfoButton() {
           <Modal
             variant="white"
             onClose={close}
+            isOpen={isopen}
             modalHeading="App description"
             animationVariant="fadeIn"
             layoutId="button-to-modal"
@@ -174,16 +196,33 @@ function WeekCard({week}) {
         borderRadius: '2px',
       }}
       whileHover={{
-        scale: 1.1,
+        scale: 1.05,
+        outline: week.Active
+          ? `2px solid ${colors.black}`
+          : `2px solid ${colors.gray80}`,
       }}
     >
       <span css={{fontSize: '1.25rem', marginRight: 8, marginLeft: 8}}>
         Week {week.Week}
       </span>
       {week.Active ? (
-        <Button variant="black" onClick={() => deactivate()}>Deactivate</Button>
+        <AnimatePresence>
+          <Button
+            variant="black"
+            onClick={() => deactivate()}
+            layoutId={`activate-deactivate-${week.ID}`}
+          >
+            Deactivate
+          </Button>
+        </AnimatePresence>
       ) : (
-        <Button variant="black" onClick={() => activate()}>Activate</Button>
+        <Button
+          variant="gray80"
+          onClick={() => activate()}
+          layoutId={`activate-deactivate-${week.ID}`}
+        >
+          Activate
+        </Button>
       )}
     </motion.div>
   )
@@ -191,17 +230,26 @@ function WeekCard({week}) {
 
 function FutureWeeks() {
   const {user} = useAuth()
-  const {data: futureWeeksData} = useSWR(
+  const {data: futureWeeksData, mutate: revalidateFutureWeeks} = useSWR(
     `coffeedate/${user.ID}/getFutureRegistriesForUser`,
     client,
   )
-  console.log(futureWeeksData, 'futureWeeks')
+
   if (futureWeeksData?.length === 0) {
     return null
   }
+  const toolTipText =
+    'These are all the upcoming weeks and their status for the date. You can opt in / opt out at anytime from participating in a date in the following weeks.'
   return (
     <Card css={{marginTop: 16}}>
-      <h2 css={{fontWeight: 600}}>Here are all the future weeks</h2>
+      <BlackTooltip title={toolTipText} placement="top-start">
+        <motion.h2
+          css={{width: 'fit-content'}}
+          {...hoverUnderlineAnimation({variant: 'initial'})}
+        >
+          Upcoming weeks
+        </motion.h2>
+      </BlackTooltip>
       <div
         css={{
           display: 'grid',
@@ -212,7 +260,12 @@ function FutureWeeks() {
         }}
       >
         {futureWeeksData?.map(week => (
-          <WeekCard key={week.ID} week={week} />
+          <WeekCard
+            key={week.ID}
+            week={week}
+            revalidate={revalidateFutureWeeks}
+            css={{opacity: 0.7}}
+          />
         ))}
       </div>
     </Card>
@@ -220,9 +273,14 @@ function FutureWeeks() {
 }
 function DashBoard() {
   return (
-    <>
+    <motion.div
+      initial={{opacity: 0}}
+      animate={{opacity: 1}}
+      exit={{opacity: 0}}
+      transition={{delay: 0.4}}
+    >
       <IntroCard /> <FutureWeeks />
-    </>
+    </motion.div>
   )
 }
 

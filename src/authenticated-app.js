@@ -1,15 +1,18 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/react'
 
-import {Routes, Route, Link, useMatch} from 'react-router-dom'
+import {Routes, Route} from 'react-router-dom'
 import {ErrorBoundary} from 'react-error-boundary'
 import {FullPageErrorFallback, ErrorMessage} from 'components/lib'
-
+import { AnimatePresence } from 'framer-motion'
 import {Header} from 'components/Header'
 import {NotFoundScreen} from 'screeens/not-found'
 import {DashBoard} from 'screeens/dashboard'
 import {AdminPanel} from 'screeens/admin-panel'
 import {useAuth} from 'context/auth-context'
+import { DateList } from 'screeens/DateList'
+import { Date } from 'screeens/Date'
+import { CurrentDate } from 'screeens/CurrentDate'
 import * as colors from 'styles/colors'
 
 function ErrorFallback({error}) {
@@ -37,11 +40,13 @@ function AuthenticatedApp() {
           css={{
             width: '100%',
             height: '100%',
-            padding: '5rem 1rem 0',
+            padding: '5rem 1rem 1rem',
           }}
         >
           <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <AppRoutes />
+            <AnimatePresence>
+              <AppRoutes />
+            </AnimatePresence>
           </ErrorBoundary>
         </main>
       </div>
@@ -53,8 +58,12 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<DashBoard />} />
-      <Route path="*" element={<NotFoundScreen />} />
       <Route path="/admin" element={<AdminPanel />} />
+      <Route path="/previous-dates" element={<DateList />} />
+      <Route path="/current-date" element={<CurrentDate />} />
+      <Route path="/date/:dateID" element={<Date />} />
+      <Route path="*" element={<NotFoundScreen />} />
+
     </Routes>
   )
 }

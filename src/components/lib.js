@@ -7,6 +7,12 @@ import {Link as RouterLink} from 'react-router-dom'
 import styled from '@emotion/styled'
 import * as colors from 'styles/colors'
 import {CoffeeIcon} from 'assets/icons'
+import Tooltip, {tooltipClasses} from '@mui/material/Tooltip'
+import MuiAlert from '@mui/material/Alert'
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+})
 
 function Button({variant, children, ...props}) {
   if (variant === undefined) {
@@ -17,21 +23,26 @@ function Button({variant, children, ...props}) {
       background: colors.brown,
       color: colors.light,
     },
-    primaryLightened: {
-      background: colors.brown,
-      color: colors.light,
-    },
     black: {
       background: colors.black,
       color: colors.white,
     },
-    light: {
-      background: colors.light,
-      color: colors.black,
-    },
     white: {
       background: colors.white,
       color: colors.black,
+    },
+    gray: {
+      background: colors.gray,
+      color: colors.white,
+    },
+    gray80: {
+      background: colors.gray80,
+      color: colors.white,
+    },
+    danger: {
+      background: colors.danger,
+      color: colors.white,
+      fontWeight: 500,
     },
   }
   const AnimatedButton = styled(motion.button)(
@@ -42,13 +53,16 @@ function Button({variant, children, ...props}) {
       cursor: 'pointer',
       borderRadius: '2px',
       transition: 'box-shadow 200ms',
+      ':hover': {
+        boxShadow: 'var(--shadow-elevation-medium)',
+      },
     },
     buttonVariants[variant],
   )
   return (
     <AnimatedButton
-      initial={{scale: 1, filter: 'none'}}
-      whileHover={{scale: 1.1, boxShadow: 'var(--shadow-elevation-medium)'}}
+      initial={{scale: 1}}
+      whileHover={{scale: 1.05}}
       whileTap={{scale: 0.9}}
       transition={{type: 'spring', stiffness: 400, damping: 17}}
       {...props}
@@ -180,9 +194,13 @@ function Modal({
   onClose,
   animationVariant = 'dropIn',
   modalHeading,
+  isOpen,
   ...props
 }) {
-  const scrollY = window.scrollY;
+  if (isOpen) {
+    document.body.style.overflow = 'hidden'
+  }
+  const scrollY = window.scrollY
   const Backdrop = styled(motion.div)(
     {
       height: '100vh',
@@ -194,7 +212,7 @@ function Modal({
       right: 0,
       left: 0,
       bottom: 0,
-      zIndex: 2
+      zIndex: 2,
     },
     backdropVariants[variant],
   )
@@ -213,9 +231,14 @@ function Modal({
     },
     containerVariants[variant],
   )
+
+  function close() {
+    document.body.style.overflow = 'auto'
+    onClose()
+  }
   return (
     <Backdrop
-      onClick={onClose}
+      onClick={() => close()}
       initial={{opacity: 0}}
       animate={{opacity: 1}}
       exit={{opacity: 0}}
@@ -246,7 +269,7 @@ function Modal({
             </span>
           )}
           <motion.svg
-            onClick={onClose}
+            onClick={() => close()}
             initial={{border: `none`, borderRadius: '50%'}}
             whileHover={{
               border: `2px solid`,
@@ -259,10 +282,10 @@ function Modal({
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-x-circle"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="feather feather-x-circle"
           >
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="15" y1="9" x2="9" y2="15"></line>
@@ -323,7 +346,110 @@ function Card({children, ...props}) {
     </div>
   )
 }
+const hoverUnderlineAnimation = ({variant}) => {
+  return {
+    initial: {
+      textDecoration: variant === 'initial' ? 'underline' : 'none',
+      textUnderlineOffset: variant === 'initial' ? '60%' : '80%',
+      textDecorationThickness: '10%',
+    },
+    whileHover: {
+      textDecoration: 'underline',
+      textUnderlineOffset: '20%',
+    },
+    transition: {
+      type: 'spring',
+      stiffness: 2000,
+      damping: 100,
+    },
+  }
+}
 
+const BlackTooltip = styled(({className, ...props}) => (
+  <Tooltip
+    {...props}
+    arrow
+    classes={{popper: className}}
+    placement="bottom-end"
+  />
+))(() => ({
+  [`& .${tooltipClasses.arrow}`]: {
+    color: colors.black,
+  },
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: colors.black,
+    color: colors.white,
+    fontSize: '0.825rem',
+    maxWidth: 400,
+  },
+}))
+
+function GridContainer({minWidth, children, ...props}) {
+  if (minWidth === undefined) {
+    minWidth = '250px'
+  }
+
+  return (
+    <div
+      css={{
+        display: 'grid',
+        gap: 32,
+        gridTemplateColumns: `repeat(auto-fill, minmax(min(${minWidth}, 100%), 1fr))`,
+        filter: 'drop-shadow(0px 2px 8px hsl(0deg 0% 0% / 0.25))',
+      }}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+}
+
+function InfoCard({children, ...props}) {
+  return (
+    <motion.div
+      css={{
+        backgroundColor: `${colors.white}`,
+        borderRadius: '2px',
+        padding: 8,
+      }}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  )
+}
+const ButtonContainer = styled(motion.div)({
+  display: 'flex',
+  gap: 8,
+  flexWrap: 'wrap',
+  marginTop: 8,
+  alignItems: 'center',
+})
+function Confirmation({onYes, onNo, title, yesLayoutId, noLayoutId}) {
+  return (
+    <ButtonContainer layout>
+      <p>{title}: </p>
+      <Button
+        variant="danger"
+        onClick={() => onYes()}
+        layoutId={yesLayoutId}
+        layout
+        transition={{ease: 'backOut', bounce: 0}}
+      >
+        Yes
+      </Button>
+      <Button
+        variant="black"
+        onClick={() => onNo()}
+        layoutId={noLayoutId}
+        layout
+        transition={{ease: 'backOut', bounce: 0}}
+      >
+        No
+      </Button>
+    </ButtonContainer>
+  )
+}
 export {
   Button,
   FullPageErrorFallback,
@@ -332,4 +458,11 @@ export {
   Link,
   Card,
   Modal,
+  hoverUnderlineAnimation,
+  BlackTooltip,
+  GridContainer,
+  InfoCard,
+  Alert,
+  ButtonContainer,
+  Confirmation,
 }

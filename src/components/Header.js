@@ -10,7 +10,7 @@ import {useLocation, Link as RouterLink} from 'react-router-dom'
 
 function Header() {
   const {user} = useAuth()
-  user.Role = 'admin'
+  
   const currentPath = useLocation().pathname
   return (
     <header
@@ -22,24 +22,23 @@ function Header() {
         backgroundColor: `${colors.black}`,
         width: '100%',
         alignItems: 'center',
-        zIndex: 2
+        zIndex: 2,
       }}
     >
       <span css={{width: '104px'}}>
-        <img alt="kantar-logo" src="/images/KANTAR_Small_Logo_White_RGB.png" />
+        <RouterLink to='/'><img alt="kantar-logo" src="/images/KANTAR_Small_Logo_White_RGB.png" /></RouterLink>
       </span>
       <div css={{display: 'flex', gap: '32px', marginLeft: 'auto'}}>
-        {user?.Role === 'admin' ? (
-          currentPath === '/' ? (
-            <RouterLink to="/admin">
-              <Button variant={'white'}> Admin Panel</Button>
-            </RouterLink>
-          ) : currentPath === '/admin' ? (
+        {user?.Role.toLowerCase() === 'admin' &&
+          (currentPath === '/admin' ? (
             <RouterLink to="/">
-              <Button variant={'white'}> User Dashboard</Button>
+              <Button variant={'white'}>User Dashboard</Button>
             </RouterLink>
-          ) : undefined
-        ) : undefined}
+          ) : (
+            <RouterLink to="/admin">
+              <Button variant={'white'}>Admin Panel</Button>
+            </RouterLink>
+          ))}
 
         <Avatar
           size={40}
