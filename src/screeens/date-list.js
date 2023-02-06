@@ -18,7 +18,7 @@ import * as colors from 'styles/colors'
 import {Link as RouterLink} from 'react-router-dom'
 
 function DateInfoCard({dateData}) {
-  const dateMembers = dateData?.Users.map(member => <div>{member.Name}</div>)
+  const dateMembers = dateData?.Users.map(member => <div key={member.ID}>{member.Name}</div>)
   return (
     <InfoCard>
       <div>

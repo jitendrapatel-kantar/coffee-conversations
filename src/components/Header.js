@@ -10,7 +10,7 @@ import {useLocation, Link as RouterLink} from 'react-router-dom'
 
 function Header() {
   const {user} = useAuth()
-  
+
   const currentPath = useLocation().pathname
   return (
     <header
@@ -26,7 +26,12 @@ function Header() {
       }}
     >
       <span css={{width: '104px'}}>
-        <RouterLink to='/'><img alt="kantar-logo" src="/images/KANTAR_Small_Logo_White_RGB.png" /></RouterLink>
+        <RouterLink to="/">
+          <img
+            alt="kantar-logo"
+            src="/images/KANTAR_Small_Logo_White_RGB.png"
+          />
+        </RouterLink>
       </span>
       <div css={{display: 'flex', gap: '32px', marginLeft: 'auto'}}>
         {user?.Role.toLowerCase() === 'admin' &&
@@ -42,7 +47,7 @@ function Header() {
 
         <Avatar
           size={40}
-          name={user.name}
+          name={user.Name}
           variant="beam"
           colors={['#B7F0AD', '#D2FF96', '#EDFF7A', '#E8D33F', '#D17B0F']}
         />

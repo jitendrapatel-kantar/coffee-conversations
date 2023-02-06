@@ -116,7 +116,7 @@ function Proposals() {
         </Alert>
       </Snackbar>
       <h3>Proposals</h3>
-      <p css={{margin: '8px 0'}}>
+      <p css={{margin: '16px 0 32px'}}>
         Here you can accept a proposed slot or propose a new one. If you propose
         a new slot all other pending proposals will be rejected automatically.
       </p>
@@ -130,7 +130,7 @@ function Proposals() {
           Propose new slot
         </Button>
       </div>
-      <GridContainer minWidth={'300px'} css={{marginTop: 16}}>
+      <GridContainer minWidth={'300px'} css={{marginTop: 32}}>
         {currentDate?.ProposedDates.map(proposal => (
           <ProposedDatesInfoCard key={proposal.ID} proposalData={proposal} />
         ))}

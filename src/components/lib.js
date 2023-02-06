@@ -238,6 +238,7 @@ function Modal({
   }
   return (
     <Backdrop
+      role='dialog'
       onClick={() => close()}
       initial={{opacity: 0}}
       animate={{opacity: 1}}
@@ -264,11 +265,12 @@ function Modal({
           }}
         >
           {modalHeading && (
-            <span css={{fontSize: '1.5rem', fontWeight: 500}}>
+            <h3 css={{marginBottom: 0}}>
               {modalHeading}
-            </span>
+            </h3>
           )}
           <motion.svg
+            aria-label='dialog-close-button'
             onClick={() => close()}
             initial={{border: `none`, borderRadius: '50%'}}
             whileHover={{
@@ -292,7 +294,7 @@ function Modal({
             <line x1="9" y1="9" x2="15" y2="15"></line>
           </motion.svg>
         </div>
-        <motion.div>{children}</motion.div>
+        <motion.div aria-label='dialog-content'>{children}</motion.div>
       </Container>
     </Backdrop>
   )

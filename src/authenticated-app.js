@@ -10,9 +10,9 @@ import {NotFoundScreen} from 'screeens/not-found'
 import {DashBoard} from 'screeens/dashboard'
 import {AdminPanel} from 'screeens/admin-panel'
 import {useAuth} from 'context/auth-context'
-import { DateList } from 'screeens/DateList'
-import { Date } from 'screeens/Date'
-import { CurrentDate } from 'screeens/CurrentDate'
+import { DateList } from 'screeens/date-list'
+import { Date } from 'screeens/date'
+import { CurrentDate } from 'screeens/current-date'
 import * as colors from 'styles/colors'
 
 function ErrorFallback({error}) {
