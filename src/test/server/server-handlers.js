@@ -7,6 +7,7 @@ const apiUrl = process.env.REACT_APP_API_URL
 const handlers = [
   rest.post(`${apiUrl}/login`, async (req, res, ctx) => {
     return res(
+      ctx.status(200),
       ctx.json({mockUser})
     )
   }),
