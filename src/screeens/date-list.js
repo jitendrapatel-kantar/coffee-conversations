@@ -10,6 +10,8 @@ import {
   GridContainer,
   Button,
   InfoCard,
+  FullPageErrorFallback,
+  FullPageLoading,
 } from 'components/lib'
 import useSWR from 'swr'
 import {client} from 'utils/api-client'
@@ -18,7 +20,9 @@ import * as colors from 'styles/colors'
 import {Link as RouterLink} from 'react-router-dom'
 
 function DateInfoCard({dateData}) {
-  const dateMembers = dateData?.Users.map(member => <div key={member.ID}>{member.Name}</div>)
+  const dateMembers = dateData?.Users.map(member => (
+    <div key={member.ID}>{member.Name}</div>
+  ))
   return (
     <InfoCard>
       <div>
@@ -42,10 +46,17 @@ function DateInfoCard({dateData}) {
 }
 function PreviousDates() {
   const {user} = useAuth()
-  const {data: previousDates} = useSWR(
-    `coffeedate/${user.ID}/getPreviousCoffeeDates`,
-    client,
-  )
+  const {
+    data: previousDates,
+    error,
+    isLoading,
+  } = useSWR(`coffeedate/${user.ID}/getPreviousCoffeeDates`, client)
+  if (isLoading) {
+    return <FullPageLoading />
+  }
+  if (error) {
+    return <FullPageErrorFallback error={error} />
+  }
   if (previousDates?.CoffeeDates.length === 0) {
     return (
       <Card>
@@ -64,6 +75,7 @@ function PreviousDates() {
       </li>
     ),
   )
+
   return (
     <Card>
       <BlackTooltip title="Here you can see all your previous dates and click on them see more details like meeting notes.">

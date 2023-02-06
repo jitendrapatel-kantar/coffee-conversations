@@ -13,6 +13,8 @@ import {
   Alert,
   ButtonContainer,
   Confirmation,
+  FullPageErrorFallback,
+  FullPageLoading,
 } from 'components/lib'
 import {useAuth} from 'context/auth-context'
 import useSWR, {useSWRConfig} from 'swr'
@@ -26,19 +28,26 @@ import {formateDateTime} from 'utils/utils'
 
 function useCurrentDate() {
   const {user} = useAuth()
-  const {data: currentDate} = useSWR(
-    `coffeedate/${user.ID}/getCurrentCoffeeDateForUser`,
-    client,
-  )
-  return currentDate
+  const {
+    data: currentDate,
+    error,
+    isLoading,
+  } = useSWR(`coffeedate/${user.ID}/getCurrentCoffeeDateForUser`, client)
+  return {currentDate, error, isLoading}
 }
 function IntroSection() {
-  const currentDate = useCurrentDate()
+  const {currentDate, error, isLoading} = useCurrentDate()
   const coffeeDateMembers = currentDate?.Users.map(user => (
     <li key={user.ID}>
       {user.Name} <em css={{color: colors.gray80}}>({user.Email})</em>
     </li>
   ))
+  if (isLoading) {
+    return <FullPageLoading />
+  }
+  if (error) {
+    return <FullPageErrorFallback error={error} />
+  }
   return (
     <>
       <BlackTooltip
@@ -69,10 +78,16 @@ function IntroSection() {
 function Proposals() {
   const {mutate} = useSWRConfig()
   const {user} = useAuth()
-  const currentDate = useCurrentDate()
+  const {currentDate, error, isLoading} = useCurrentDate()
 
   const [alertOpen, setAlertOpen] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState('')
+  if (isLoading) {
+    return <FullPageLoading />
+  }
+  if (error) {
+    return <FullPageErrorFallback error={error} />
+  }
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return
@@ -142,8 +157,13 @@ function Proposals() {
 function ProposedDatesInfoCard({proposalData}) {
   const {mutate} = useSWRConfig()
   const {user} = useAuth()
-  const currentDate = useCurrentDate()
-
+  const {currentDate, error, isLoading} = useCurrentDate()
+  if (isLoading) {
+    return <FullPageLoading />
+  }
+  if (error) {
+    return <FullPageErrorFallback error={error} />
+  }
   const {formatedDate, formatedTime} = formateDateTime(
     proposalData?.ProposedDate,
   )
@@ -188,11 +208,16 @@ function ProposedDatesInfoCard({proposalData}) {
   )
 }
 
-
 function Notes() {
-  const currentDate = useCurrentDate()
+  const {currentDate, error, isLoading} = useCurrentDate()
   const {mutate} = useSWRConfig()
   const {user} = useAuth()
+  if (isLoading) {
+    return <FullPageLoading />
+  }
+  if (error) {
+    return <FullPageErrorFallback error={error} />
+  }
   async function createNewNote() {
     const enteredText = document.getElementById('create-new-note').value
     await client(`coffeedate/${currentDate.ID}/AddNote`, {
@@ -208,20 +233,20 @@ function Notes() {
     <Section>
       <h3 css={{marginBottom: 16}}>Notes</h3>
       <GridContainer minWidth={'500px'}>
-      <InfoCard>
-        <TextField
+        <InfoCard>
+          <TextField
             id="create-new-note"
             label="Create new note"
             fullWidth
             multiline
             rows={3}
           />
-        <ButtonContainer>
-          <Button variant={'black'} onClick={() => createNewNote()}>
-            Create new Note
-          </Button>
-        </ButtonContainer>
-      </InfoCard>
+          <ButtonContainer>
+            <Button variant={'black'} onClick={() => createNewNote()}>
+              Create new Note
+            </Button>
+          </ButtonContainer>
+        </InfoCard>
         {currentDate?.Notes.map(note => (
           <NoteCard key={note.ID} noteData={note} />
         ))}

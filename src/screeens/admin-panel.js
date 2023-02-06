@@ -11,7 +11,10 @@ import {
   hoverUnderlineAnimation,
   GridContainer,
   InfoCard,
-  ButtonContainer, Confirmation
+  ButtonContainer,
+  Confirmation,
+  FullPageLoading,
+  FullPageErrorFallback,
 } from 'components/lib'
 import {Link as RouterLink} from 'react-router-dom'
 import useSWR, {useSWRConfig} from 'swr'
@@ -22,13 +25,23 @@ import {formateDateTime} from 'utils/utils'
 
 function UserList() {
   const {user} = useAuth()
-  const {data: allUsers} = useSWR(`${user.ID}/getallusers`, client)
+  const {
+    data: allUsers,
+    error,
+    isLoading,
+  } = useSWR(`${user.ID}/getallusers`, client)
   const normalUsers = allUsers?.filter(
     item => item.Role.toLowerCase() === 'normal' && item.ID !== user.ID,
   )
   const adminUsers = allUsers?.filter(
     item => item.Role.toLowerCase() === 'admin' && item.ID !== user.ID,
   )
+  if (isLoading) {
+    return <FullPageLoading />
+  }
+  if (error) {
+    return <FullPageErrorFallback error={error} />
+  }
   return (
     <Card>
       <BlackTooltip

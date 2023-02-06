@@ -8,6 +8,8 @@ import {
   Modal,
   hoverUnderlineAnimation,
   BlackTooltip,
+  FullPageErrorFallback,
+  FullPageLoading,
 } from 'components/lib'
 import {motion, AnimatePresence} from 'framer-motion'
 import * as colors from 'styles/colors'
@@ -18,11 +20,18 @@ import {Link as RouterLink} from 'react-router-dom'
 
 function IntroCard() {
   const {user} = useAuth()
-  const {data: currentDate} = useSWR(
-    `coffeedate/${user.ID}/getCurrentCoffeeDateForUser`,
-    client,
-  )
-
+  const {mutate} = useSWRConfig()
+  const {
+    data: currentDate,
+    error,
+    isLoading,
+  } = useSWR(`coffeedate/${user.ID}/getCurrentCoffeeDateForUser`, client)
+  if (isLoading) {
+    return <FullPageLoading />
+  }
+  if (error) {
+    return <FullPageErrorFallback error={error} />
+  }
   const coffeeDateMembers = currentDate?.Users.map(member => (
     <BlackTooltip key={member.ID} title={member.Email}>
       <motion.span {...hoverUnderlineAnimation({variant: 'initial'})}>
@@ -31,7 +40,7 @@ function IntroCard() {
     </BlackTooltip>
   ))
 
-  const {mutate} = useSWRConfig()
+  
   async function register() {
     await client('coffeedate/register', {
       data: {
@@ -230,11 +239,17 @@ function WeekCard({week}) {
 
 function FutureWeeks() {
   const {user} = useAuth()
-  const {data: futureWeeksData, mutate: revalidateFutureWeeks} = useSWR(
-    `coffeedate/${user.ID}/getFutureRegistriesForUser`,
-    client,
-  )
-
+  const {
+    data: futureWeeksData,
+    error,
+    isLoading,
+  } = useSWR(`coffeedate/${user.ID}/getFutureRegistriesForUser`, client)
+  if (isLoading) {
+    return <FullPageLoading />
+  }
+  if (error) {
+    return <FullPageErrorFallback error={error} />
+  }
   if (futureWeeksData?.length === 0) {
     return null
   }
@@ -260,12 +275,7 @@ function FutureWeeks() {
         }}
       >
         {futureWeeksData?.map(week => (
-          <WeekCard
-            key={week.ID}
-            week={week}
-            revalidate={revalidateFutureWeeks}
-            css={{opacity: 0.7}}
-          />
+          <WeekCard key={week.ID} week={week} css={{opacity: 0.7}} />
         ))}
       </div>
     </Card>
