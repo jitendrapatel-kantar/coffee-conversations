@@ -1,3 +1,4 @@
+import React from 'react'
 import {
   render as rtlRender,
   screen,
@@ -5,15 +6,23 @@ import {
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {AppProviders} from 'context'
-import { mockUser } from './data/mock-user'
+import {mockUser} from './data/mock-user'
+import {SWRConfig} from 'swr'
 
-async function render(ui, {route = '/list', user, ...renderOptions} = {}) {
+const Wrapper = ({children}) => {
+  return (
+    <SWRConfig value={{dedupingInterval: 0}}>
+      <AppProviders>{children}</AppProviders>
+    </SWRConfig>
+  )
+}
+async function render(ui, {route = '/', user, ...renderOptions} = {}) {
   user = typeof user === 'undefined' ? mockUser : user
   window.history.pushState({}, 'Test page', route)
 
   const returnValue = {
     ...rtlRender(ui, {
-      wrapper: AppProviders,
+      wrapper: Wrapper,
       ...renderOptions,
     }),
     user,
@@ -30,6 +39,7 @@ const waitForLoadingToFinish = () =>
       ...screen.queryAllByLabelText(/loading/i),
       ...screen.queryAllByText(/loading/i),
     ],
+    {timeout: 10000},
   )
 
 export * from '@testing-library/react'

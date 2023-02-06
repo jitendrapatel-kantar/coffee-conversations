@@ -5,7 +5,7 @@
 import '@testing-library/jest-dom'
 import {server} from 'test/server/test-server'
 import * as auth from 'utils/auth'
-
+import { cache } from "swr";
 
 // enable API mocking in test runs using the same request handlers
 // as for the client-side mocking.
@@ -14,11 +14,12 @@ afterAll(() => server.close())
 afterEach(() => server.resetHandlers())
 
 // make debug output for TestingLibrary Errors larger
-process.env.DEBUG_PRINT_LIMIT = 15000
+process.env.DEBUG_PRINT_LIMIT = 150000
 
 
 //general cleanup
 afterEach(async () => {
+  cache?.clear();
   await Promise.all([
     auth.logout()
   ])
