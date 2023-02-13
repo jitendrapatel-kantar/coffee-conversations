@@ -8,8 +8,8 @@ export const mockCurrentDateData = {
   Users: [
     {
       ID: '2af4f487-c0ea-4466-b7f0-ac4fdd3f562d',
-      Name: 'Jitendra Patel',
-      Email: 'jitendra.patel.kantar@blackwoodseven.com',
+      Name: 'Dummy user',
+      Email: 'dummy.user@email.com',
       Role: 'Admin',
       CreatedAt: '2023-02-02T06:28:42.541Z',
       UpdatedAt: '2023-02-06T13:36:43.425Z',
@@ -18,7 +18,7 @@ export const mockCurrentDateData = {
     {
       ID: '82617126-a34b-11ed-abe6-0242ac120002',
       Name: 'New Admin user',
-      Email: 'newAdmin.user@blackwoodseven.com',
+      Email: 'newAdmin.user@email.com',
       Role: 'Admin',
       CreatedAt: '2023-02-03T09:44:40Z',
       UpdatedAt: '2023-02-03T18:34:56.203Z',
